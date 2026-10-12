@@ -1,0 +1,175 @@
+System architecture 畫成直的
+圖片放大
+貼code (Router, Controller, Checker)
+Regex result
+自動化檢測程式的Payload 
+
+Introduction
+- need edit(like add Chapter2 and some description to next page)
+- Motivation
+- Contribution
+- Organization
+We 
+Background
+- HTTP Request Smuggling
+- flask 
+  - input\_stream
+  - abort
+  - request
+  - get\_data
+  - request.environ
+  - request.header
+- socket
+- WSGI
+- Reverse Proxy
+- Regex
+- RFC Standard
+
+
+- Case Study (Bug Bounty, CVE) &&為了更瞭解這種攻擊，我們將介紹幾個在現實生活中的例子
+
+Future Work
+- add more function or defence
+
+\begin{table}[htbp]
+\centering
+\caption{Comparison of related ICS security research and the proposed method.}
+\label{tab:comparison}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l c c c c c}
+\hline
+\textbf{Literature} & \textbf{Core Methodology} & \textbf{Continuous} & \textbf{Alert} & \textbf{System} & \textbf{Standard Integration} & \textbf{ICS Cyber} \\ 
+ & & \textbf{Monitoring} & \textbf{Interpretability} & \textbf{Overhead} & \textbf{(e.g., ISA/IEC 62443 3-3)} & \textbf{Kill Chain} \\ \hline
+Pliatsios \cite{ref_report25} / Luswata \cite{ref_report27} & Survey / Pentest & No & High & Low & Low & Low \\ 
+ShadowPLCs \cite{ref_report28} & State Mirroring & Yes & High & High & Low & Low \\ 
+Kim \& Park \cite{ref_report29} & Machine Learning & Yes & Low & Medium & Low & Low \\ 
+Digital Twin \cite{ref_report30} & Simulation & Yes & Medium & High & Low & Low \\ \hline
+\textbf{Proposed Work} & \textbf{DPI + SIEM Integration} & \textbf{Yes} & \textbf{High} & \textbf{Low} & \textbf{High (Mapped)} & \textbf{High (Mapped)} \\ \hline
+\end{tabular}}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+% 移除 resizebox，改用 \small 確保字體具備可讀性且統一
+\small 
+\begin{tabular}{l l c c c c c}
+\hline
+\textbf{Literature} & \textbf{Core Methodology} & \textbf{Continuous} & \textbf{Alert} & \textbf{System} & \textbf{Standard Integration} & \textbf{ICS Cyber} \\ 
+ & & \textbf{Monitoring} & \textbf{Interpretability} & \textbf{Overhead} & \textbf{(e.g., ISA/IEC 62443 3-3)} & \textbf{Kill Chain} \\ \hline
+Pliatsios \cite{ref_report25} / Luswata \cite{ref_report27} & Survey / Pentest & No & High & Low & Low & Low \\ 
+ShadowPLCs \cite{ref_report28} & State Mirroring & Yes & High & High & Low & Low \\ 
+Kim \& Park \cite{ref_report29} & Machine Learning & Yes & Low & Medium & Low & Low \\ 
+Digital Twin \cite{ref_report30} & Simulation & Yes & Medium & High & Low & Low \\ \hline
+\textbf{Proposed Work} & \textbf{DPI + SIEM Integration} & \textbf{Yes} & \textbf{High} & \textbf{Low} & \textbf{High (Mapped)} & \textbf{High (Mapped)} \\ \hline
+\end{tabular}
+
+% 將標題與標籤移至 tabular 環境之後，它就會顯示在表格下方
+\caption{Comparison of related ICS security research and the proposed method.}
+\label{tab:comparison}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small % 保持字級適中，不傷眼
+% 使用 p{寬度} 來限制每一欄的最大寬度，強迫長標題自動換行
+\begin{tabular}{p{2.5cm} p{3cm} c c c p{3cm} p{2cm}}
+\hline
+\textbf{Literature} & \textbf{Core Methodology} & \textbf{Continuous} & \textbf{Alert} & \textbf{System} & \textbf{Standard Integration} & \textbf{ICS Cyber} \\ 
+ & & \textbf{Monitoring} & \textbf{Interp.} & \textbf{Overhead} & \textbf{(e.g., IEC 62443)} & \textbf{Kill Chain} \\ \hline
+Pliatsios \cite{ref_report25} / Luswata \cite{ref_report27} & Survey / Pentest & No & High & Low & Low & Low \\ 
+ShadowPLCs \cite{ref_report28} & State Mirroring & Yes & High & High & Low & Low \\ 
+Kim \& Park \cite{ref_report29} & Machine Learning & Yes & Low & Medium & Low & Low \\ 
+Digital Twin \cite{ref_report30} & Simulation & Yes & Medium & High & Low & Low \\ \hline
+\textbf{Proposed Work} & \textbf{DPI + SIEM Integration} & \textbf{Yes} & \textbf{High} & \textbf{Low} & \textbf{High (Mapped)} & \textbf{High (Mapped)} \\ \hline
+\end{tabular}
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{3pt} % 【絕招 1】稍微縮減欄位之間的預設空白
+\begin{tabular}{@{} p{2.8cm} p{2.5cm} c c c p{2.3cm} p{2cm} @{}} % 【絕招 2】加上 @{} 消除最外側留白
+\hline
+\textbf{Literature} & \textbf{Methodology} & \textbf{Cont.} & \textbf{Alert} & \textbf{System} & \textbf{IEC 62443} & \textbf{ICS Kill} \\
+ & & \textbf{Monitor} & \textbf{Interp.} & \textbf{Overhead} & \textbf{Mapped} & \textbf{Chain} \\ \hline
+Pliatsios \cite{ref_report25} / \newline Luswata \cite{ref_report27} & Survey / Pentest & No & High & Low & Low & Low \\ 
+ShadowPLCs \cite{ref_report28} & State Mirroring & Yes & High & High & Low & Low \\ 
+Kim \& Park \cite{ref_report29} & Machine Learning & Yes & Low & Medium & Low & Low \\ 
+Digital Twin \cite{ref_report30} & Simulation & Yes & Medium & High & Low & Low \\ \hline
+\textbf{Proposed Work} & \textbf{DPI + SIEM} & \textbf{Yes} & \textbf{High} & \textbf{Low} & \textbf{High (Mapped)} & \textbf{High (Mapped)} \\ \hline
+\end{tabular}
+
+\caption{Comparison of related ICS security research and the proposed method.}
+\label{tab:comparison}
+\end{table}
+
+\caption{Comparison of related ICS security research and the proposed method.}
+\label{tab:comparison}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\footnotesize % 【絕招 1】字體再降一級，期刊標準做法
+\setlength{\tabcolsep}{2pt} % 【絕招 2】極限壓縮欄距
+% 【絕招 3】精確計算的欄寬，加總絕對不會超過 A4 邊界
+\begin{tabular}{@{} p{2.8cm} p{2.2cm} c c c p{2.2cm} p{1.6cm} @{}}
+\hline
+\textbf{Literature} & \textbf{Methodology} & \textbf{Cont.} & \textbf{Alert} & \textbf{System} & \textbf{IEC 62443} & \textbf{ICS Kill} \\
+ & & \textbf{Monitor} & \textbf{Interp.} & \textbf{Overhead} & \textbf{Mapped} & \textbf{Chain} \\ \hline
+Pliatsios \cite{ref_report25} / \newline Luswata \cite{ref_report27} & Survey / \newline Pentest & No & High & Low & Low & Low \\ 
+ShadowPLCs \cite{ref_report28} & State \newline Mirroring & Yes & High & High & Low & Low \\ 
+Kim \& Park \cite{ref_report29} & Machine \newline Learning & Yes & Low & Medium & Low & Low \\ 
+Digital Twin \cite{ref_report30} & Simulation & Yes & Medium & High & Low & Low \\ \hline
+\textbf{Proposed Work} & \textbf{DPI + SIEM} & \textbf{Yes} & \textbf{High} & \textbf{Low} & \textbf{High} & \textbf{High} \\ \hline
+\end{tabular}
+
+\caption{Comparison of related ICS security research and the proposed method.}
+\label{tab:comparison}
+\end{table}
+
+----
+[圖 4.3：偵測規則與工控阻殺鏈 Stage 2 及 IEC 62443 映射圖] 
+[Figure 4.3: Mapping between Detection Rules, ICS Cyber Kill Chain Stage 2, and IEC 62443]
+[圖 4.4：系統異常偵測邏輯流程圖] 
+[Figure 4.4: System Anomaly Detection Logic Flowchart]
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{@{} >{\centering\arraybackslash}p{1.5cm} p{3.5cm} X @{}}
+\toprule
+\textbf{FC} & \textbf{Action} & \textbf{Threat Type \& Vulnerability Description} \\
+\midrule
+
+01--04
+  & Read Operations
+  & \textbf{Reconnaissance} --- Attackers can passively sniff or actively query process values,
+    leading to sensitive operational data leakage. \\
+\addlinespace
+
+\shortstack{05/06 \\ 15/16}
+  & Write Operations
+  & \textbf{Command Injection} --- Unauthorized modification of Coils or Holding Registers can lead
+    to equipment damage or process interruption. \\
+\addlinespace
+
+08
+  & Diagnostics
+  & \textbf{Denial of Service (DoS)} --- Misuse of the restart communications sub-function can disrupt
+    communication between Level~2 and Level~1. \\
+\addlinespace
+
+17, 43
+  & Discovery
+  & \textbf{Target Enumeration} --- Information gathering regarding device manufacturer, model, and
+    firmware version for future precision attacks. \\
+\addlinespace
+
+{$>$43}
+  & Undefined / Proprietary
+  & \textbf{Protocol Fuzzing} --- Exploiting undefined FCs to probe PLC response logic and trigger
+    potential exception-handling flaws. \\
+
+\bottomrule
+\end{tabularx}
+\caption{Modbus Function Codes and Associated Vulnerabilities Mapping}
+\label{tab:modbus_fc_vuln}
+\end{table}

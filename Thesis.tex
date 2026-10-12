@@ -1,0 +1,288 @@
+\documentclass[12pt]{report}
+
+\usepackage{wallpaper} %background
+\usepackage{geometry} %the margin setting
+\usepackage{graphicx} %input the image
+\usepackage{cite} %reference
+\usepackage{enumitem} %use item style
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage[hidelinks]{hyperref} % link to content
+\usepackage{url} %url reference
+\usepackage{etoolbox}
+\usepackage{setspace} %set space
+\usepackage{rotating}
+\usepackage{float}
+%Chinese setting
+\usepackage{fontspec}   %加這個就可以設定字體
+\usepackage{xeCJK}       %讓中英文字體分開設置
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{fit, positioning}
+\usepackage{fontawesome5}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage[table]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning, fit, arrows.meta, shapes.geometric}
+\usepackage{amssymb}
+\usepackage{caption}
+\captionsetup[table]{justification=centering}
+\usepackage{geometry}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{graphicx} %input the image
+\usepackage{pdfpages} % insert PDF pages
+
+%====================== wai leong custom =======================%
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[toc,page]{appendix}
+%===============================================================%
+
+\def\UrlBreaks{\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J
+\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V
+\do\W\do\X\do\Y\do\Z\do\[\do\\\do\]\do\^\do\_\do\`\do\a\do\b
+\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n
+\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z
+\do\.\do\@\do\\\do\/\do\!\do\-\do\|\do\;\do\>\do\]\do\)\do\,
+\do\?\do\'\do+\do\=\do\#} %url遇特殊字元自動換行
+
+\apptocmd{\thebibliography}{\raggedright}{}{} %url過長自動換行
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\lstdefinestyle{appendixcode}{
+    backgroundcolor=\color{backcolour},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    columns=fullflexible,
+    keepspaces=true,
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single
+}
+
+%\setCJKmainfont{FangSong} %設定中文為系統上的字型，而英文不去更動，使用原TeX字型
+\setCJKmainfont{KAIU.TTF}
+\XeTeXlinebreaklocale "zh"       %這兩行一定要加，中文才能自動換行
+\XeTeXlinebreakskip = 0pt plus 1pt     %這兩行一定要加，中文才能自動換行
+
+%format setting
+\geometry{verbose, a4paper, tmargin=3.0cm, bmargin=4.0cm, lmargin=3.00cm, rmargin=3.00cm, twoside}
+\linespread{1.45}
+\setlength{\parskip}{0.35\baselineskip}
+\usepackage{indentfirst} %每段首行縮排
+\parindent=2em
+
+%table format
+\newcommand{\tabincell}[2]{/begin{tabular}{@{}#1@{}}#2 /end{tabular}} 
+
+%====================== wai leong custom =======================%
+\newcommand{\footlabel}[2]{%
+    \addtocounter{footnote}{1}%
+    \footnotetext[\thefootnote]{%
+        \addtocounter{footnote}{-1}%
+        \refstepcounter{footnote}\label{#1}%
+        #2%
+    }%
+    $^{\ref{#1}}$%
+}
+
+\algnewcommand\algorithmicforeach{\textbf{foreach}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+% \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+%===============================================================%
+\begin{document}
+
+% 封面與審定書區，不顯示頁碼
+\pagenumbering{gobble}
+\pagestyle{empty}
+
+% 第一頁：封面
+\input{00_cover.tex}
+\clearpage
+
+% 第二頁：空白頁
+\thispagestyle{empty}
+\null
+\clearpage
+
+% 第三頁：再放一次封面
+\input{00_cover.tex}
+\clearpage
+
+% 插入 PDF，不顯示頁碼
+\includepdf[
+    pages=-,
+    pagecommand={\thispagestyle{empty}}
+]{auth.pdf}
+
+\includepdf[
+    pages=-,
+    pagecommand={\thispagestyle{empty}}
+]{re.pdf}
+
+\includepdf[
+    pages=-,
+    pagecommand={\thispagestyle{empty}}
+]{teaher1.pdf}
+
+\includepdf[
+    pages=-,
+    pagecommand={\thispagestyle{empty}}
+]{teaher2.pdf}
+
+% ================= Front matter page numbering =================
+% 從摘要開始使用羅馬數字頁碼
+\clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\pagestyle{plain}
+
+% 中文摘要
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract(Chinese)}
+
+\input{02_CH_abstract}
+\thispagestyle{plain}
+\clearpage
+
+
+% 英文摘要
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
+
+\begin{center}
+{\LARGE \bfseries Abstract}
+\end{center}
+
+\vspace{1em}
+
+\input{01_abstract.tex}
+\thispagestyle{plain}
+\clearpage
+
+% Acknowledgement
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Acknowledgement(Chinese)}
+
+\input{03_acknowledgement.tex}
+\thispagestyle{plain}
+\clearpage
+
+% Table of Contents
+\begin{spacing}{1.0}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bfseries Table of Contents}
+\tableofcontents
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bfseries List of Figures}
+\listoffigures
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bfseries List of Tables}
+\listoftables
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bfseries List of Listings}
+\lstlistoflistings
+\clearpage
+\end{spacing}
+
+%===============================================================%
+%chapter start!
+%===============================================================%
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\chapter{Introduction} \label{introduction}
+\input{04_introduction.tex}
+
+\chapter{Background} \label{Background}
+\input{05_background.tex}
+
+\chapter{Related Works} \label{relate_work}
+\input{06_related_work.tex}
+
+\chapter{Methodology} \label{methodology}
+\input{07_methodology.tex}
+
+\chapter{Evaluation} \label{experimental_result}
+\input{08_experimental_result.tex}
+
+\chapter{Conclusion} \label{conclusion}
+\input{09_conclusion.tex}
+
+\newpage
+
+%Reference
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+\input{11_Reference.tex}
+\newpage
+
+%===============================================================%Old Ref
+%Reference
+%\addcontentsline{toc}{chapter}{Bibliography}
+%\bibliographystyle{plain}
+%\bibliography{10_bibliography} \label{bibli}
+%\newpage
+%===============================================================%
+%Appendix
+%\input{12_appendix.tex} \label{appendix}
+\appendix
+\chapter{Supplementary Rules and Attack Payloads}
+\input{12_appendix.tex} \label{appendix}
+
+% Back cover
+\clearpage
+\thispagestyle{empty}
+\null
+
+\end{document}
