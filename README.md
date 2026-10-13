@@ -1,110 +1,159 @@
-# Modbus TCP Threat Monitoring Framework
+# 🛡️ Modbus TCP Threat Monitoring Framework
 
-This repository contains the source code and attack simulation scripts for the paper: **"Design and Implementation of a Modbus TCP Threat Monitoring Framework Based on ISA/IEC 62443 and the ICS Cyber Kill Chain Using Suricata and Graylog"**. 
+[![Standard](https://img.shields.io/badge/Standard-ISA%2FIEC_62443--3--3-blue.svg)](https://www.isa.org/isa99/)
+[![Kill Chain](https://img.shields.io/badge/Framework-ICS_Cyber_Kill_Chain-red.svg)](https://www.sans.org/)
+[![DPI](https://img.shields.io/badge/DPI-Suricata-orange.svg)](https://suricata.io/)
+[![SIEM](https://img.shields.io/badge/SIEM-Graylog-green.svg)](https://www.graylog.org/)
 
-This project provides a reproducible virtualized testbed for evaluating Deep Packet Inspection (DPI) rules against various Modbus TCP attack scenarios, mapped to the ICS Cyber Kill Chain and ISA/IEC 62443-3-3 Foundational Requirements.
+This repository contains the source code, attack simulation scripts, and Suricata detection rules for the paper: **"Design and Implementation of a Modbus TCP Threat Monitoring Framework Based on ISA/IEC 62443 and the ICS Cyber Kill Chain Using Suricata and Graylog"**.
 
-## 📋 Repository Structure
+This project provides a reproducible virtualized testbed for evaluating Deep Packet Inspection (DPI) rules against various Modbus TCP attack scenarios.
 
-*   `baseline_modbus_traffic.py`: Generates benign Modbus read requests (FC 01, 02, 03) to establish a normal traffic baseline.
-*   `scenario-B.py` / `Scenario-B1.py` / `Scenario-B2-Client.py`: Scripts simulating **Protocol Fuzzing** (ICS Kill Chain: Deliver). Injects unsupported function codes and invalid protocol IDs.
-*   `scenario-C.py` / `Scenario-C1.py` / `Scenario-C2.py`: Scripts simulating **Unauthorized Modification** (ICS Kill Chain: Install/Modify). Attempts to tamper with PLC coils and registers (FC 05, 06, 15, 16, 22, 23).
-*   `scenario-D.py`: Script simulating **Critical Command Injection** (ICS Kill Chain: Execute Attack). Sends crafted diagnostic commands (FC 08).
-*   `Scenario-E2.py`: Script simulating **Denial-of-Service Flooding** via Modbus TCP payload flooding.
+---
 
 ## 🏗️ Experimental Environment Setup
 
-Based on the paper's architecture, a two-VM setup is recommended:
+The experimental testbed consists of two virtual machines:
 
 *   **VM1 (Attacker Node):** Kali Linux (IP: `192.168.11.128`). Runs the Python attack scripts and Nmap.
-*   **VM2 (Defender/Target Node):** Ubuntu (IP: `192.168.11.129`). Runs ModbusPal (PLC Simulator), Suricata (IDS), and Graylog SIEM (Docker).
+*   **VM2 (Defender Node):** Ubuntu 22.04 LTS (IP: `192.168.11.129`). Hosts the OT simulation layer (ModbusPal) and security monitoring layer (Suricata, Graylog).
 
-*Note: If your target PLC/Simulator IP is different, please update the `TARGET_IP` variable inside each Python script.*
-
-### Prerequisites (Kali Linux / VM1)
-Ensure you have Python 3 installed. You will need the `pymodbus` library to run the scripts.
+### ⚙️ Prerequisites (Kali Linux / VM1)
+Ensure Python 3.11+ is installed along with the required communication library:
 ```bash
 pip install pymodbus
 ```
 
 ---
 
-## 🚀 Detailed Operation Steps
+## 🚀 Attack Scenarios & Detection Rules (Step-by-Step)
 
-Before running the attack scenarios, ensure that **ModbusPal** (listening on TCP/502), **Suricata**, and **Graylog** are actively running on VM2.
+Before running the scenarios, ensure that **ModbusPal** (listening on TCP/502), **Suricata** (with `local.rules` loaded), and **Graylog** are actively running on VM2.
 
-### Step 0: Baseline Traffic Generation
-Establish a benign traffic baseline to verify that normal operations do not trigger Suricata alerts.
-1. On VM1, execute the baseline script:
-   ```bash
-   python baseline_modbus_traffic.py
-   ```
-2. **Expected Result:** The console should display normal responses for FC 0x01, 0x02, and 0x03. No alerts should appear in Graylog.
+### 🟢 Step 0: Baseline Traffic Generation
+Establish a benign traffic baseline to verify that normal operations do not trigger false positive alerts.
 
-### Step 1: Scenario A - Reconnaissance Scanning (Test Stage)
+*   **Execution Script:**
+    ```bash
+    python baseline_modbus_traffic.py
+    ```
+*   **Target Function Codes:** `FC 01`, `FC 02`, `FC 03`.
+*   **Triggered Rules:** *None (Benign Traffic)*.
+*   **Expected Result:** The console displays normal read responses. Suricata generates no alerts.
+
+---
+
+### 🔍 Step 1: Scenario A - Reconnaissance Scanning
 Simulates an attacker attempting to discover Modbus TCP devices in the network.
-1. On VM1, use Nmap to scan the target:
-   ```bash
-   nmap -p 502 --script modbus-discover 192.168.11.129
-   ```
-2. **Expected Result:** Graylog will trigger an alert for **Rule A (Normal Severity)** indicating device fingerprinting (FC 17 / FC 43).
 
-### Step 2: Scenario B - Modbus Protocol Fuzzing (Deliver Stage)
-Simulates sending malformed or semantically abnormal packets to test device robustness.
-1. On VM1, execute the base fuzzing script:
-   ```bash
-   python scenario-B.py
-   ```
-2. *(Optional)* To test combined anomalies (Invalid Protocol ID and FCs), run:
-   ```bash
-   python Scenario-B1.py
-   ```
-3. *(Optional)* To test exception response handling, run the server/client combo:
-   ```bash
-   python Scenario-B2-Client.py
-   ```
-4. **Expected Result:** Graylog will trigger an alert for **Rule B (Normal Severity)**, indicating protocol fuzzing and abnormal exceptions.
+> **Kill Chain Stage:** Test | **Severity:** Normal | **IEC 62443-3-3:** FR 5 (Restricted Data Flow)
 
-### Step 3: Scenario C - Unauthorized Modification (Install/Modify Stage)
+*   **Execution Command:**
+    ```bash
+    nmap -p 502 --script modbus-discover 192.168.11.129
+    ```
+*   **Correlated Suricata Rules:**
+    ```text
+    alert tcp any any -> any 502 (msg:"5.2.1 Test: Scenario A - Nmap Modbus Scan Phase 1 (FC 17)"; modbus:function 17; classtype:attempted-recon; sid:1000101; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.1 Test: Scenario A - Nmap Modbus Scan Phase 2 (FC 43 Device Identification)"; flow:established,to_server; modbus:function 43; classtype:attempted-recon; sid:1000102; rev:3;)
+    ```
+
+---
+
+### 💣 Step 2: Scenario B - Modbus Protocol Fuzzing
+Simulates sending malformed packets, unsupported function codes, or triggering excessive exception responses.
+
+> **Kill Chain Stage:** Deliver | **Severity:** Normal | **IEC 62443-3-3:** FR 3 (System Integrity)
+
+*   **Execution Scripts:**
+    ```bash
+    python scenario-B.py          # Probes unsupported FCs (60-109)
+    python Scenario-B1.py         # Alternates between Invalid Protocol ID and unsupported FCs
+    python Scenario-B2-Client.py  # Triggers various Modbus Exception responses
+    ```
+*   **Correlated Suricata Rules (Extracts):**
+    ```text
+    # Malformed / Unsupported FCs
+    alert tcp any any -> any 502 (msg:"5.2.2 Deliver: Scenario B1 - Unsupported Modbus Function Code Probe Detected"; flow:established,to_server; dsize:>7; byte_test:2,=,0,2; byte_test:1,>,43,7; classtype:protocol-command-decode; sid:1000201; rev:2;)
+    alert tcp any any -> any 502 (msg:"5.2.2 Deliver: Scenario B1 - Malformed MBAP Header Invalid Protocol ID Detected (!= 0x0000)"; flow:established,to_server; dsize:>7; byte_test:2,!=,0,2; classtype:protocol-command-decode; sid:1000202; rev:1;)
+    
+    # Exception Responses (0x01 to 0x0B)
+    alert tcp any 502 -> any any (msg:"5.2.3 Deliver: Scenario B2 - Modbus Exception Illegal Function Detected (0x01)"; flow:established,to_client; dsize:>8; byte_test:2,=,0,2; byte_test:1,&,0x80,7; byte_test:1,=,1,8; classtype:attempted-recon; sid:1000203; rev:1;)
+    alert tcp any 502 -> any any (msg:"5.2.3 Deliver: Scenario B2 - Modbus Exception Illegal Data Address Detected (0x02)"; flow:established,to_client; dsize:>8; byte_test:2,=,0,2; byte_test:1,&,0x80,7; byte_test:1,=,2,8; classtype:attempted-recon; sid:1000204; rev:1;)
+    ... (Includes SIDs 1000205 to 1000212 for all covered exception codes)
+    ```
+
+---
+
+### ⚠️ Step 3: Scenario C - Unauthorized Modification
 Simulates unauthorized write operations altering control-related variables.
-1. On VM1, execute the basic tamper script (FC 05, FC 06):
-   ```bash
-   python scenario-C.py
-   ```
-2. *(Optional)* To test multiple coils/registers tampering (FC 15, FC 16), run:
-   ```bash
-   python Scenario-C1.py
-   ```
-3. *(Optional)* To test advanced masking and R/W operations (FC 22, FC 23), run:
-   ```bash
-   python Scenario-C2.py
-   ```
-4. **Expected Result:** Graylog will trigger an alert for **Rule C (High Severity)**, indicating unauthorized modification attempts from a non-whitelisted IP.
 
-### Step 4: Scenario D - Critical Command Injection (Execute Attack Stage)
-Simulates the injection of high-risk diagnostic commands that affect device communication.
-1. On VM1, execute the raw socket injection script:
-   ```bash
-   python scenario-D.py
-   ```
-2. **Expected Result:** Graylog will trigger an alert for **Rule D (High Severity)**, detecting the FC 08 (Sub-function 0x0001) restart communication command.
+> **Kill Chain Stage:** Install / Modify | **Severity:** High | **IEC 62443-3-3:** FR 2 (Use Control)
 
-### Step 5: Scenario E - Denial-of-Service Flooding (Execute Attack Stage)
+*   **Execution Scripts:**
+    ```bash
+    python scenario-C.py          # Tamper using FC 05 (Write Coil), FC 06 (Write Register)
+    python Scenario-C1.py         # Tamper using FC 15 (Multiple Coils), FC 16 (Multiple Registers)
+    python Scenario-C2.py         # Advanced tamper using FC 22 (Mask), FC 23 (Read/Write Multi)
+    ```
+*   **Correlated Suricata Rules:**
+    ```text
+    alert tcp any any -> any 502 (msg:"5.2.4 Install / Modify: Scenario C1 - Modbus Write Coil (FC 05)"; flow:established,to_server; dsize:>7; byte_test:1,=,5,7; classtype:attempted-admin; sid:1000301; rev:2;)
+    alert tcp any any -> any 502 (msg:"5.2.4 Install / Modify: Scenario C1 - Modbus Write Register (FC 06)"; flow:established,to_server; dsize:>7; byte_test:1,=,6,7; classtype:attempted-admin; sid:1000302; rev:2;)
+    alert tcp any any -> any 502 (msg:"5.2.4 Install / Modify: Scenario C1 - Modbus Write Multiple Coils (FC 15)"; flow:established,to_server; dsize:>7; byte_test:1,=,15,7; classtype:attempted-admin; sid:1000303; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.4 Install / Modify: Scenario C1 - Modbus Write Multiple Registers (FC 16)"; flow:established,to_server; dsize:>7; byte_test:1,=,16,7; classtype:attempted-admin; sid:1000304; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.5 Install / Modify: Scenario C2 - Modbus Mask Write Register Detected (FC 22)"; flow:established,to_server; dsize:>7; byte_test:2,=,0,2; byte_test:1,=,22,7; classtype:protocol-command-decode; sid:1000305; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.5 Install / Modify: Scenario C2 - Modbus Read/Write Multiple Registers Detected (FC 23)"; flow:established,to_server; dsize:>7; byte_test:2,=,0,2; byte_test:1,=,23,7; classtype:protocol-command-decode; sid:1000306; rev:1;)
+    ```
+
+---
+
+### 🚨 Step 4: Scenario D - Critical Command Injection
+Simulates the injection of high-risk diagnostic commands that affect device communication or state.
+
+> **Kill Chain Stage:** Execute ICS Attack | **Severity:** High | **IEC 62443-3-3:** FR 3 (System Integrity)
+
+*   **Execution Script:**
+    ```bash
+    python scenario-D.py          # Injects FC 08 (Diagnostics) via raw socket
+    ```
+*   **Correlated Suricata Rules:**
+    ```text
+    alert tcp any any -> any 502 (msg:"5.2.6 Execute: Scenario D - Modbus Diagnostic Command Detected"; flow:established,to_server; dsize:>7; byte_test:2,=,0,2; byte_test:1,=,8,7; classtype:protocol-command-decode; sid:10000402; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.6 Execute: Scenario D - Modbus FC08/0001 Restart Communications Option"; flow:established,to_server; dsize:>9; byte_test:2,=,0,2;byte_test:1,=,8,7; byte_test:2,=,1,8; classtype:protocol-command-decode; sid:10000404; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.6 Execute: Scenario D - Modbus FC08/0004 Force Listen Only Mode"; flow:established,to_server; dsize:>9; byte_test:2,=,0,2; byte_test:1,=,8,7; byte_test:2,=,4,8; classtype:protocol-command-decode; sid:10000405; rev:1;)
+    alert tcp any any -> any 502 (msg:"5.2.6 Execute: Scenario D - Modbus FC08/000A Clear Counters and Diagnostic Register"; flow:established,to_server; dsize:>9; byte_test:2,=,0,2; byte_test:1,=,8,7; byte_test:2,=,10,8; classtype:protocol-command-decode; sid:10000406; rev:1;)
+    ```
+
+---
+
+### 🛑 Step 5: Scenario E - Denial-of-Service (DoS) Flooding
 Simulates a resource exhaustion attack against the Modbus TCP service.
-1. On VM1, execute the high-rate payload flood script:
-   ```bash
-   python Scenario-E2.py --host 192.168.11.129 --port 502 --duration 10 --connections 5
-   ```
-2. *(Alternative method using hping3 from the thesis)*:
-   ```bash
-   sudo hping3 -S -p 502 --flood 192.168.11.129
-   ```
-3. **Expected Result:** Graylog will trigger an alert for **Rule E (High Severity)** due to the threshold of connection attempts/packets exceeding the predefined limit, and a traffic spike will be visible in the SIEM dashboard.
 
-## 📊 Evaluation & Traceability
-All alerts generated during these scenarios will automatically map to:
-*   **ISA/IEC 62443-3-3** Foundational Requirements (FR 2, FR 3, FR 5, FR 7).
-*   **ICS Cyber Kill Chain** Stages.
-*   **MITRE ATT&CK for ICS** Tactics and Techniques.
+> **Kill Chain Stage:** Execute ICS Attack | **Severity:** High | **IEC 62443-3-3:** FR 7 (Resource Availability)
 
-Please check the Graylog dashboard for the correlated alert logs and severity classifications.
+*   **Execution Scripts:**
+    ```bash
+    # Test High-rate SYN Activity
+    sudo hping3 -S -p 502 --flood 192.168.11.129
+    
+    # Test High-rate Payload Activity
+    python Scenario-E2.py --host 192.168.11.129 --port 502 --duration 10 --connections 5
+    ```
+*   **Correlated Suricata Rules:**
+    ```text
+    alert tcp any any -> any 502 (msg:"5.2.7 Execute ICS Attack: Scenario E1 - Modbus TCP/502 High-rate SYN Activity Detected"; flow:stateless,to_server; flags:S; threshold:type both, track by_src, count 20, seconds 1; classtype:attempted-dos; sid:1000501; rev:6;)
+    alert tcp any any -> any 502 (msg:"5.2.8 Execute ICS Attack: Scenario E2 - Modbus TCP/502 High-rate Payload Activity Detected"; flow:established,to_server; dsize:>0; threshold:type both, track by_src, count 100, seconds 1; classtype:attempted-dos; sid:1000502; rev:1;)
+    ```
+
+---
+
+## 📊 SIEM Integration & Traceability
+
+When the above rules are triggered in Suricata, the logs are forwarded to Graylog. Graylog correlates these alerts based on:
+1. **Rule Signatures & Time Windows**
+2. **ICS Cyber Kill Chain Mapping**
+3. **ISA/IEC 62443-3-3 Foundational Requirements**
+4. **MITRE ATT&CK for ICS Techniques**
+
+Please monitor the **Graylog Dashboard** during script execution to verify real-time alert generation, traffic spike visualization, and dynamic incident response notifications.
